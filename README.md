@@ -2,7 +2,7 @@
 
 Once the repository has been cloned, please run the setup bash script in order to link the main executable python files to your path directory. Do this by locating the cloned directory and running the following commands:
 
-  `bash `
+  `bash setup.sh`
   
   `source ~/.bashrc`
 
