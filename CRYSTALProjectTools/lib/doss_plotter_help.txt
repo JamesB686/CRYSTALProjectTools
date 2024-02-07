@@ -1,0 +1,33 @@
+###########################################
+#            DOSS PLOTTER HELP            #
+###########################################
+
+When calling the doss plotting function, the command line instructtion can be used:
+
+    doss /path/to/file/filename.f25
+
+Alternatively one can simply call the doss function and the program will prompt the file to be entered in.
+
+The program is semi-specific to a particular class of metal complex and therefore should be used appropriately.
+
+The following arguments are available for the doss plotting system with their respective default values:
+
+    - beta (True)                   :  Required if the DOSS has been plotted in an unrestricted formalism.
+    - fermi (True)                  :  Generates a fermi line on the plot.
+    - save (False)                  :  Saves a copy of the output plot as a png file.
+    - units ('eV')                  :  Sets the units of the plot (choice of eV or Ha).
+    - title (None)                  :  Generates a title for the plot.
+    - plot_label (False)            :  Boolean for generating labels for the overlayed plots.
+    - labels (None)                 :  List of labels for the plot.
+
+The following values are modifiable, however often only the defaults are necessary. 
+Therefore there is an option to use the default values for the following arguments:
+
+    - beta
+    - fermi
+    - save
+    - units
+    - title
+
+The labelling will be checked via a single user input, which if returned true will open up the labelling optionality.
+

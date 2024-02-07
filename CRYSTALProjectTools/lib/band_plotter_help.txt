@@ -1,0 +1,41 @@
+###########################################
+#            BAND PLOTTER HELP            #
+###########################################
+
+When calling the band plotting function, the command line instructtion can be used:
+
+    band /path/to/file/filename.f25
+
+Alternatively one can simply call the band function and the program will prompt the file to be entered in.
+
+The program is semi-specific to a particular class of metal complex and therefore should be used appropriately.
+
+The following arguments are available for the band plotting system with their respective default values:
+
+    - beta (True)                   :  Required if the band has been plotted in an unrestricted formalism.
+    - band_num (None)               :  A list of two numbers that specfiy a range of bands to be plotted.
+    - relabel (None)                :  Single number that specifies the mimimum band if that is not the first band evaluated.
+    - fermi (True)                  :  Generates a fermi line on the plot.
+    - fermi_label (False)           :  Generates the fermi label in the legend.
+    - save (False)                  :  Saves a copy of the output plot as a png file.
+    - units ('eV')                  :  Sets the units of the plot (choice of eV or Ha).
+    - title (None)                  :  Generates a title for the plot.
+    - alpha_band_highlight (None)   :  A list containing the set of alpha bands that wish to be highlighted in the plot.
+    - beta_band_highlight (None)    :  A list containing the set of beta bands that wish to be highlighted in the plot.
+    - highlight_relabel (False)     :  Boolean for relabelling the highlighted bands so that they are commensurate with the band labels.
+    - lower_band (None)             :  Number specifying the lower band to change.
+
+The following values are modifiable, however often only the defaults are necessary. 
+Therefore there is an option to use the default values for the following arguments:
+
+    - beta
+    - band_num
+    - relabel
+    - fermi
+    - fermi_label
+    - save
+    - units
+    - title
+
+The highlighting will be checked via a single user input, which if returned true will open up the highlighting optionality.
+
