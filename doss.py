@@ -10,7 +10,7 @@ print("###########################################\n")
 
 
 try:
-    rgument = sys.argv[1]
+    argument = sys.argv[1]
 
 except:
     cur_dir = os.listdir(os.getcwd())
