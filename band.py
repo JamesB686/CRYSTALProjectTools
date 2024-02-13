@@ -150,6 +150,8 @@ elif user_highlight_choice == 'yes' and beta == False:
 elif user_highlight_choice == 'no':
     user_alpha_list = None
     user_beta_list = None
+    user_band_highlight = False
+    user_lower_band = None
 
 if user_highlight_choice == 'yes':
     user_band_highlight = input('Is band relabelling required so as to select the correct bands for highlighting? (Yes/No): ').lower()    
