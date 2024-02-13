@@ -484,7 +484,7 @@ class Properties_Object():
                                 t += 1
 
                             if j in alpha_band_highlight:
-                                plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                plt.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                             else:
                                 plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
@@ -525,7 +525,7 @@ class Properties_Object():
                                         t += 1
 
                                     if j in alpha_band_highlight:
-                                        plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                        plt.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                                     else:
                                         plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
@@ -563,7 +563,7 @@ class Properties_Object():
                                     t += 1
 
                                 if j in alpha_band_highlight:
-                                    plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                    plt.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                                 else:
                                     plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
@@ -623,9 +623,9 @@ class Properties_Object():
         elif beta == True:
             # For unrestricted band plots use the matplotlib subplot formula.
 
-            plt.subplots(1, 2, sharey=True)
+            plt.subplots(1, 2)
             
-            plt.subplot(1, 2, 1)
+            ax1 = plt.subplot(1, 2, 1)
             
             if band_num == None:
                 if alpha_band_highlight == None:
@@ -640,7 +640,7 @@ class Properties_Object():
                             band.append(alpha_matrix[t, j])
                             k_point_list.append(t)
                             t += 1
-                        plt.plot(k_point_list, band, color='black', linewidth=0.75)
+                        ax1.plot(k_point_list, band, color='black', linewidth=0.75)
                         j += 1
                 else:
                     t = 0
@@ -658,9 +658,9 @@ class Properties_Object():
                                 t += 1
 
                             if j in alpha_band_highlight:
-                                plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                ax1.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                             else:
-                                plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
+                                ax1.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
                             j += 1
 
@@ -679,7 +679,7 @@ class Properties_Object():
                                     band.append(alpha_matrix[t, j])
                                     k_point_list.append(t)
                                     t += 1
-                                plt.plot(k_point_list, band, color='black', linewidth=0.75)
+                                ax1.plot(k_point_list, band, color='black', linewidth=0.75)
                                 j += 1
                         except:
                             print('ERROR: Specified band labels are not within the evaluated band numbers.')
@@ -700,9 +700,9 @@ class Properties_Object():
                                         t += 1
 
                                     if j in alpha_band_highlight:
-                                        plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                        ax1.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                                     else:
-                                        plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
+                                        ax1.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
                                     j += 1
                         except:
@@ -720,7 +720,7 @@ class Properties_Object():
                                 band.append(alpha_matrix[t, j])
                                 k_point_list.append(t)
                                 t += 1
-                            plt.plot(k_point_list, band, color='black', linewidth=0.75)
+                            ax1.plot(k_point_list, band, color='black', linewidth=0.75)
                             j += 1
                     else:
                         t = 0
@@ -738,9 +738,9 @@ class Properties_Object():
                                     t += 1
 
                                 if j in alpha_band_highlight:
-                                    plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                    ax1.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                                 else:
-                                    plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
+                                    ax1.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
                                 j += 1
 
@@ -755,31 +755,27 @@ class Properties_Object():
                 while s < self.n_kpoints:
                     fermi_list.append(0)
                     s += 1
-                plt.plot(k_points, fermi_list, color='blue',
+                ax1.plot(k_points, fermi_list, color='blue',
                          linewidth=1.25, label='Fermi Energy')
                 if fermi_label == True:
-                    plt.legend(loc='upper right')
+                    ax1.legend(loc='upper right')
 
             # Set up labels for both x and y axis.
 
             if units == 'eV':
                 ev_conv = 27.211386
-                plt.ylabel('Energy (eV)')
+                ax1.set_ylabel('Energy (eV)')
 
-                ev_band_min = round((float(self.band_min)-float(self.fermi))*ev_conv)
-                ev_band_max = round((float(self.band_max)-float(self.fermi))*ev_conv)
-                
-                # Here locs is the list of ticks and y_labels are the list of labels for the ticks.
-                # Locs are given in Ha and labels in eV.   
+                ev_band_min = round((float(self.band_min) - float(self.fermi)) * ev_conv)
+                ev_band_max = round((float(self.band_max) - float(self.fermi)) * ev_conv)
 
-                locs = []
-                y_labels = []
+                locs = [int(i) / ev_conv for i in range(ev_band_min, ev_band_max + 1)]
+                y_labels = ['{0:.2f}'.format(int(i)) for i in range(ev_band_min, ev_band_max + 1)]
 
-                for i in range(ev_band_min, (ev_band_max + 1), 1):
-                    locs.append(int(i)/ev_conv)
-                    y_labels.append('{0:.2f}'.format(int(i)))
+                print(y_labels)
 
-                plt.yticks(locs, labels=y_labels)
+                ax1.set_yticks(locs)
+                ax1.set_yticklabels(y_labels)
 
             else:
                 plt.ylabel('Energy (Ha)')
@@ -792,7 +788,7 @@ class Properties_Object():
                 plt.xticks(ticks=[0, (self.n_kpoints-1)], labels=[str(int(self.seg_start_kz)), str(int(self.seg_end_kz))])
             plt.title('Alpha Bands')
 
-            plt.subplot(1, 2, 2)
+            ax2 = plt.subplot(1, 2, 2)
 
             if band_num == None:
                 if beta_band_highlight == None:
@@ -807,7 +803,7 @@ class Properties_Object():
                             band.append(beta_matrix[t, j])
                             k_point_list.append(t)
                             t += 1
-                        plt.plot(k_point_list, band, color='black', linewidth=0.75)
+                        ax2.plot(k_point_list, band, color='black', linewidth=0.75)
                         j += 1
                 else:
                     t = 0
@@ -825,9 +821,9 @@ class Properties_Object():
                                 t += 1
 
                             if j in beta_band_highlight:
-                                plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                ax2.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                             else:
-                                plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
+                                ax2.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
                             j += 1
 
@@ -846,7 +842,7 @@ class Properties_Object():
                                     band.append(beta_matrix[t, j])
                                     k_point_list.append(t)
                                     t += 1
-                                plt.plot(k_point_list, band, color='black', linewidth=0.75)
+                                ax2.plot(k_point_list, band, color='black', linewidth=0.75)
                                 j += 1
                         except:
                             print('ERROR: Specified band labels are not within the evaluated band numbers.')
@@ -867,9 +863,9 @@ class Properties_Object():
                                         t += 1
 
                                     if j in beta_band_highlight:
-                                        plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                        ax2.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                                     else:
-                                        plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
+                                        ax2.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
                                     j += 1
                         except:
@@ -887,7 +883,7 @@ class Properties_Object():
                                 band.append(beta_matrix[t, j])
                                 k_point_list.append(t)
                                 t += 1
-                            plt.plot(k_point_list, band, color='black', linewidth=0.75)
+                            ax2.plot(k_point_list, band, color='black', linewidth=0.75)
                             j += 1
                     else:
                         t = 0
@@ -905,9 +901,9 @@ class Properties_Object():
                                     t += 1
 
                                 if j in beta_band_highlight:
-                                    plt.plot(k_point_list_current, current_band, color='red', linewidth=1.25)
+                                    ax2.plot(k_point_list_current, current_band, color='red', linewidth=0.75)
                                 else:
-                                    plt.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
+                                    ax2.plot(k_point_list_current, current_band, color='black', linewidth=0.75)
 
                                 j += 1
 
@@ -922,7 +918,7 @@ class Properties_Object():
                 while s < self.n_kpoints:
                     fermi_list.append(0)
                     s += 1
-                plt.plot(k_points, fermi_list, color='blue',
+                ax2.plot(k_points, fermi_list, color='blue',
                          linewidth=1.25, label='Fermi Energy')
 
             # Set up labels for both x and y axis.
@@ -934,7 +930,8 @@ class Properties_Object():
                 plt.xticks(ticks=[0, (self.n_kpoints-1)], labels=[str(int(self.seg_start_kz)), str(int(self.seg_end_kz))])
 
             plt.xlabel('k($\pi$/a)')
-            plt.tick_params(axis='y', left=False)
+            # # ax2.tick_params(axis='y', left=False)
+            ax2.set_yticks([])
             plt.title('Beta Bands')
 
             if title == None:
