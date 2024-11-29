@@ -38,7 +38,7 @@ class Properties_Object():
             sys.exit(1)
 
 
-    def read_cry_bands(self, prop_output, beta=True, fermi=None):
+    def read_cry_bands(self, prop_output, beta=True, fermi=None, fermi_diff=False):
         # Import in a .f25 properties output file and read in the data
         # Data then used to plot the bands.
 
@@ -93,8 +93,19 @@ class Properties_Object():
                         self.fermi = float((self.spec_line.split()[4])[11:])
                     elif type(fermi) == int:
                         self.fermi = float(fermi)
-                    elif type(fermi) == list and len(fermi) == 2:
+                    elif type(fermi) == list and len(fermi) == 2 and fermi_diff == False:
                         self.fermi = float((fermi[0] + fermi[1])/2)
+                    elif type(fermi) == list and len(fermi) == 2 and fermi_diff == True:
+                        self.fermi_alpha = float(fermi[0])
+                        self.fermi_beta = float(fermi[1])
+                        if self.fermi_alpha > self.fermi_beta:
+                            self.fermi_larger = self.fermi_alpha
+                            self.fermi_beta_diff = self.fermi_alpha-self.fermi_beta
+                            self.fermi_alpha_diff = 0 
+                        elif self.fermi_alpha < self.fermi_beta:
+                            self.fermi_larger = self.fermi_beta
+                            self.fermi_alpha_diff = self.fermi_beta-self.fermi_alpha
+                            self.fermi_beta_diff = 0
                     else:
                         print('ERROR: Fermi assignment is incorrect. Please configure the fermi variable correctly.')
                         sys.exit(1)
@@ -309,8 +320,12 @@ class Properties_Object():
                     p = 0
 
                     while 0 <= t <= (self.n_bands - 1):
-                        self.band_matrix[(t, j)] = (
-                            float(data_list[p]) - float(self.fermi))
+                        if fermi_diff == False:
+                            self.band_matrix[(t, j)] = (
+                                float(data_list[p]) - float(self.fermi))
+                        elif fermi_diff == True:
+                            self.band_matrix[(t, j)] = (
+                                float(data_list[p]) - float(self.fermi_alpha) - float(self.fermi_alpha_diff))
                         t += 1
                         p += 1
                         if t == (self.n_bands):
@@ -318,7 +333,10 @@ class Properties_Object():
                             j += 1
                             continue
                         elif j == (self.alpha_n_kpoint_list[i] - 1) and t == (self.n_bands - 1):
-                            self.band_matrix[(t, j)] = (float(data_line[-1]) - float(self.fermi))
+                            if fermi_diff == False:
+                                self.band_matrix[(t, j)] = (float(data_line[-1]) - float(self.fermi))
+                            elif fermi_diff == True:
+                                self.band_matrix[(t, j)] = (float(data_line[-1]) - float(self.fermi_alpha) - float(self.fermi_alpha_diff))    
                             break
 
                     self.alpha_matrix.append(tuple(self.band_matrix))
@@ -359,8 +377,12 @@ class Properties_Object():
                     p = 0
 
                     while 0 <= t <= (self.n_bands - 1):
-                        self.band_matrix[(t, j)] = (
-                            float(data_list[p]) - float(self.fermi))
+                        if fermi_diff == False:
+                            self.band_matrix[(t, j)] = (
+                                float(data_list[p]) - float(self.fermi))
+                        elif fermi_diff == True:
+                            self.band_matrix[(t, j)] = (
+                                float(data_list[p]) - float(self.fermi_beta) + float(self.fermi_beta_diff))
                         t += 1
                         p += 1
                         if t == (self.n_bands):
@@ -368,7 +390,10 @@ class Properties_Object():
                             j += 1
                             continue
                         elif j == (self.beta_n_kpoint_list[b] - 1) and t == (self.n_bands - 1):
-                            self.band_matrix[(t, j)] = (float(data_line[-1]) - float(self.fermi))
+                            if fermi_diff == False:
+                                self.band_matrix[(t, j)] = (float(data_line[-1]) - float(self.fermi))
+                            elif fermi_diff == True:
+                                self.band_matrix[(t, j)] = (float(data_line[-1]) - float(self.fermi_beta) + float(self.fermi_beta_diff))
                             break
 
                     self.beta_matrix.append(tuple(self.band_matrix))
@@ -519,7 +544,7 @@ class Properties_Object():
     def plot_cry_bands(self, prop_output, beta = True, band_num = None, 
                        relabel = None, fermi = True, fermi_shift=None, fermi_label = False, save=False, 
                        units = 'eV', title=None, alpha_band_highlight=None, 
-                       beta_band_highlight=None, highlight_relabel=False, lower_band=None, tick_labels=None, fontweight='normal'):
+                       beta_band_highlight=None, highlight_relabel=False, lower_band=None, tick_labels=None, fontweight='normal', fermi_diff=False, fermi_num=None):
         # Function to plot the band structure as formatted by the read cry bands function.
         # Initialised by running the read cry function.
         # Optimizsed for a Jupyter Notebook environment.
@@ -531,9 +556,9 @@ class Properties_Object():
         plt.rcParams['font.family'] = 'DejaVu Sans'
 
         if beta == False:
-            self.read_cry_bands(prop_output, beta=False, fermi=fermi_shift)
+            self.read_cry_bands(prop_output, beta=False, fermi=fermi_shift, fermi_diff = False)
         else:
-            self.read_cry_bands(prop_output, beta=True, fermi=fermi_shift)
+            self.read_cry_bands(prop_output, beta=True, fermi=fermi_shift, fermi_diff=fermi_diff)
 
         # Define alpha and beta matrices for the bands.
 
@@ -816,7 +841,7 @@ class Properties_Object():
         
             # Set up labels for both x and y axis.
         
-            plt.xticks()
+            plt.set_xticks()
 
             if units == 'eV':
 
@@ -856,10 +881,10 @@ class Properties_Object():
 
 
             if tick_labels == None:
-                plt.xticks(ticks=final_tick_list, labels=self.alpha_k_seg_list, fontweight=fontweight)
+                plt.set_xticks(ticks=final_tick_list, labels=self.alpha_k_seg_list, fontweight=fontweight)
             
             else:
-                plt.xticks(ticks=final_tick_list, labels=tick_labels, fontweight=fontweight)
+                plt.set_xticks(ticks=final_tick_list, labels=tick_labels, fontweight=fontweight)
 
             for c, nums in enumerate(final_tick_list):
                 if 0 < c < (len(final_tick_list) - 1):
@@ -874,9 +899,9 @@ class Properties_Object():
         elif beta == True:
             # For unrestricted band plots use the matplotlib subplot formula.
 
-            plt.subplots(1, 2)
+            fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True)
             
-            ax1 = plt.subplot(1, 2, 1)
+            # ax1 = plt.subplot(1, 2, 1)
             
             if band_num == None:
                 if alpha_band_highlight == None:
@@ -1017,20 +1042,29 @@ class Properties_Object():
             if units == 'eV':
                 ev_conv = 27.211386
                 ax1.set_ylabel('Energy (eV)', fontweight=fontweight)
-
-                ev_band_min = round((float(self.band_min) - float(self.fermi)) * ev_conv)
-                ev_band_max = round((float(self.band_max) - float(self.fermi)) * ev_conv)
-
+                
+                # Calculate band limits
+                if fermi_diff == False:
+                    ev_band_min = round((float(self.band_min) - float(self.fermi)) * ev_conv)
+                    ev_band_max = round((float(self.band_max) - float(self.fermi)) * ev_conv)
+                else:
+                    ev_band_min = round((float(self.band_min) - float(self.fermi_alpha) - float(self.fermi_alpha_diff)) * ev_conv)
+                    ev_band_max = round((float(self.band_max) - float(self.fermi_alpha) - float(self.fermi_alpha_diff)) * ev_conv)
+                
+                # Generate y-tick positions and labels
                 locs = [int(i) / ev_conv for i in range(ev_band_min, ev_band_max + 1, 2)]
                 y_labels = ['{0:.2f}'.format(int(i)) for i in range(ev_band_min, ev_band_max + 1, 2)]
 
                 ax1.set_yticks(locs)
                 ax1.set_yticklabels(y_labels, fontweight=fontweight)
 
-            else:
-                plt.ylabel('Energy (Ha)', fontweight=fontweight)
+                ax1.tick_params(axis='y', left=True)
 
-            plt.xlabel('k(π/a)', fontweight=fontweight)
+
+            else:
+                ax1.set_ylabel('Energy (Ha)', fontweight=fontweight)
+
+            ax1.set_xlabel('k(π/a)', fontweight=fontweight)
 
             tmp_tick_list = []
             tmp_tick_list.append(0)
@@ -1047,18 +1081,18 @@ class Properties_Object():
 
 
             if tick_labels == None:
-                plt.xticks(ticks=final_tick_list, labels=self.alpha_k_seg_list, fontweight=fontweight)
+                ax1.set_xticks(ticks=final_tick_list, labels=self.alpha_k_seg_list, fontweight=fontweight)
             
             else:
-                plt.xticks(ticks=final_tick_list, labels=tick_labels, fontweight=fontweight)
+                ax1.set_xticks(ticks=final_tick_list, labels=tick_labels, fontweight=fontweight)
 
             for c, nums in enumerate(final_tick_list):
                 if 0 < c < (len(final_tick_list) - 1):
-                    plt.axvline(x=nums, color = 'black', linewidth=0.8)
+                    ax1.axvline(x=nums, color = 'black', linewidth=0.8)
 
-            plt.title('Alpha Bands', fontweight=fontweight)
+            ax1.set_title('Alpha Bands', fontweight=fontweight)
 
-            ax2 = plt.subplot(1, 2, 2)
+            # ax2 = plt.subplot(1, 2, 2)
 
             if band_num == None:
                 if beta_band_highlight == None:
@@ -1193,7 +1227,7 @@ class Properties_Object():
 
             # Set up labels for both x and y axis.
             
-            plt.xlabel('k(π/a)', fontweight=fontweight)
+            ax2.set_xlabel('k(π/a)', fontweight=fontweight)
 
             tmp_tick_list = []
             tmp_tick_list.append(0)
@@ -1209,22 +1243,23 @@ class Properties_Object():
                 final_tick_list.append(current_sum)
 
             if tick_labels == None:
-                plt.xticks(ticks=final_tick_list, labels=self.beta_k_seg_list, fontweight=fontweight)
+                ax2.set_xticks(ticks=final_tick_list, labels=self.beta_k_seg_list, fontweight=fontweight)
             
             else:
-                plt.xticks(ticks=final_tick_list, labels=tick_labels, fontweight=fontweight)
+                ax2.set_xticks(ticks=final_tick_list, labels=tick_labels, fontweight=fontweight)
 
             for c, nums in enumerate(final_tick_list):
                 if 0 < c < (len(final_tick_list) - 1):
                     plt.axvline(x=nums, color = 'black', linewidth=0.8)
-            # # ax2.tick_params(axis='y', left=False)
-            ax2.set_yticks([])
-            plt.title('Beta Bands', fontweight=fontweight)
+
+            ax2.tick_params(left=False, labelleft=False)
+            # # ax2.set_yticks([])
+            ax2.set_title('Beta Bands', fontweight=fontweight)
 
             if title == None:
-                plt.suptitle(self.file_title[:-4], fontweight=fontweight) 
+                fig.suptitle(self.file_title[:-4], fontweight=fontweight) 
             else:
-                plt.suptitle(str(title), fontweight=fontweight) 
+                fig.suptitle(str(title), fontweight=fontweight) 
 
             plt.show()
 
@@ -1255,7 +1290,6 @@ class Properties_Object():
             energy_axis.append(
                 float((self.first_point - self.fermi_e) + (self.e_point_dis * i)))
             i += 1
-
         
         doss_dict_len = len(self.doss_dict)
         doss_len = int(doss_dict_len/2)
@@ -1314,7 +1348,7 @@ class Properties_Object():
                     locs.append(int(i)/ev_conv)
                     y_labels.append('{0:.2f}'.format(int(i)))
 
-                plt.xticks(locs, labels=y_labels)
+                plt.set_xticks(locs, labels=y_labels)
 
                 plt.ylabel('Density of States (States/eV/Cell)')
 
